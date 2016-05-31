@@ -3,8 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Usach/Algoritmos%20Avanzados/Automata/src/automatas/AFND.java</file>
-            <file>file:/D:/Usach/Algoritmos%20Avanzados/Automata/src/automatas/IngresarMatriz.java</file>
+            <file>file:/home/kari/Documentos/Compiladores/Lab001/Compiladores/src/automatas/Thompson.java</file>
+            <file>file:/home/kari/Documentos/Compiladores/Lab001/Compiladores/src/automatas/AFND_e.java</file>
+            <file>file:/home/kari/Documentos/Compiladores/Lab001/Compiladores/src/automatas/AFND.java</file>
+            <file>file:/home/kari/Documentos/Compiladores/Lab001/Compiladores/src/automatas/AFD.java</file>
+            <file>file:/home/kari/Documentos/Compiladores/Lab001/Compiladores/src/automatas/Test.java</file>
         </group>
     </open-files>
 </project-private>

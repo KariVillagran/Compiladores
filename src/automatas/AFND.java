@@ -16,126 +16,57 @@ import java.util.HashSet;
  */
 public class AFND {
     
-    static ArrayList listStates = new ArrayList();
-    static ArrayList diccionario = new ArrayList();
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-        
-        //String [][] x={{"","0","1"},{"1","2","1,2"},{"2","2,3","3"},{"3","3","3"}}; 
-        
-        String [][] x={{"","a","b","c"},{"1","1,2,3","2,3","3"},{"1,2,3","1,2,3","2,3","3"},{"2,3","phi","2,3","3"},{"3","phi","phi","3"}};
-        //String [][] x= IngresarMatriz.llenarMatrix();
-        
-        //System.out.println(getResult(x, "123", "q0"));
-        
-        listStates = getStates(x);
-        diccionario = getDictionary(x);
-        String [][] result = execMethod(x);
-        result = getAFDphi(result);
-        result = finishStates(result);
-        
-        for (int i = 0; i < result.length; i++)
-        {
-            System.out.println("----------------------");
-            for (int j = 0; j < result[0].length; j++)
-            {   
-                System.out.println("Indice i:" + i + " j:" + j + " valor: " + result[i][j]);
-            }
-        }
-        
-        System.out.println("----------------------");
-        System.out.println("Contenido de estados");
-        for (int j = 0; j < listStates.size(); j++)
-        {   
-            System.out.println("valor: " + listStates.get(j));
-        }
-        System.out.println("----------------------");
-        System.out.println("Contenido de diccionario");
-        for (int j = 0; j < diccionario.size(); j++)
-        {   
-            System.out.println("valor: " + diccionario.get(j));
-        }
-        
-        if(getResult(result, "a", "2,3"))
-        {
-            System.out.println("La cadena pertenece al lengaueje");
-        }
-        else
-        {
-            System.out.println("La cadena NO pertenece al lengaueje");
-        }
-        
-        
-    }    
-    
-    // automata finito deterministico
-    public static boolean getResult(String[][] matriz,String word, String EstadoFinal)
+    private ArrayList listStates;
+    private ArrayList diccionario;
+    private String [][] transitionTable;
+
+    public AFND(String [][] transicion)
     {
-        boolean salida=false;
-        int EstadoTransitorio=1;
-        for (int i = 1; i <= word.length(); i++)
-        {
-            int j=i-1;
-            for (int x = 1; x < matriz.length; x++)
-            {
-                if(word.substring(j,i).equals(matriz[0][x]))
-                {
-                    EstadoTransitorio=Integer.parseInt(matriz[EstadoTransitorio][x]); 
-                    break;
-                }
-            }
-        }        
-        if(EstadoFinal.equals(matriz[EstadoTransitorio][0]))
-        {
-            salida = true;
-        }
-         return salida;
+        this.transitionTable = transicion;
+        this.listStates = getStates();
     }
     
     // obtiene la lista de estados del automata
-    public static ArrayList getStates(String[][] matriz)
+    public ArrayList getStates()
     {
         ArrayList estados = new ArrayList();
         
-        for(int i = 1; i < matriz.length ; i++)
+        for(int i = 1; i < this.getTransitionTable().length ; i++)
         {
-            estados.add(matriz[i][0]);
+            estados.add(this.getTransitionTable()[i][0]);
         }        
         return estados;
     }
     
     // obtiene la lista de estados del automata
-    public static ArrayList getDictionary(String[][] matriz)
+    public ArrayList getDictionary()
     {
         ArrayList estados = new ArrayList();
         
-        for(int i = 1; i < matriz[0].length ; i++)
+        for(int i = 1; i < this.transitionTable[0].length ; i++)
         {
-            estados.add(matriz[0][i]);
+            estados.add(this.transitionTable[0][i]);
         }        
         return estados;
     }
     
-    // obtiene el diccionario del automata
-    public static void getNewStates(String[][] matriz)
+    // obtiene el nuevo diccionario del automata
+    public void getNewStates()
     {       
-        for (int i = 1; i < matriz.length; i++)
+        for (int i = 1; i < this.transitionTable.length; i++)
         {
-            for (int x = 1; x < matriz[i].length; x++)
+            for (int x = 1; x < this.transitionTable[i].length; x++)
             {
-                if(isValidString(matriz[i][x],matriz))
+                if(isValidString(this.transitionTable[i][x],this.transitionTable))
                 {
-                    listStates.add(matriz[i][x]);
+                    getListStates().add(this.transitionTable[i][x]);
                 }
             }
         }
     }
     
-    public static boolean isValidString(Object x,String[][] matriz)
+    // Se considera un string valido aquel que no esta en la lista y no es estado "phi"
+    public boolean isValidString(Object x,String[][] matriz)
     {
         boolean result = false;
         String error = "";
@@ -153,72 +84,69 @@ public class AFND {
     }
     
     // revela la nueva matriz con los estados descubiertos nuevos
-    public static String[][] reveleStates(String[][] matriz)
+    public String[][] reveleStates()
     {
-        String [][] newMatrix = new String [listStates.size()+1][matriz[0].length];
-        for (int i = 1; i < matriz.length; i++)
+        String [][] newMatrix = new String [getListStates().size()+1][this.transitionTable[0].length];
+        for (int i = 1; i < this.transitionTable.length; i++)
         {
-            for (int x = 1; x < matriz[i].length; x++)
+            for (int x = 1; x < this.transitionTable[i].length; x++)
             {
-                if (listStates.contains(matriz[i][x]))
+                if (getListStates().contains(this.transitionTable[i][x]))
                 {
                     //newMatrix[i][x] = Integer.toString(listStates.indexOf(matriz[i][x])+1);
-                    newMatrix[i][x] = matriz[i][x];
+                    newMatrix[i][x] = this.transitionTable[i][x];
                 }
                 else
                 {
-                    listStates.add(matriz[i][x]);
+                    getListStates().add(this.transitionTable[i][x]);
                     //newMatrix[i][x] = Integer.toString(listStates.indexOf(matriz[i][x])+1);
-                    newMatrix[i][x] = matriz[i][x];
+                    newMatrix[i][x] = this.transitionTable[i][x];
                 }
             }
         }
         return newMatrix;
     }
     
-    public static String[][] finishStates(String[][] matriz)
+    public void finishStates()
     {
-        String [][] newMatrix = new String [listStates.size()+1][matriz[0].length];
         String error = "";
-        for (int i = 1; i < matriz.length; i++)
+        for (int i = 1; i < this.transitionTable.length; i++)
         {
-            for (int x = 1; x < matriz[i].length; x++)
+            for (int x = 1; x < this.transitionTable[i].length; x++)
             {
-                int a = listStates.indexOf(matriz[i][x])+1;
-                newMatrix[i][x] = Integer.toString(listStates.indexOf(matriz[i][x])+1);                    
+                int a = getListStates().indexOf(this.transitionTable[i][x])+1;
+                
+                this.transitionTable[i][x] = String.valueOf(getListStates().indexOf(this.transitionTable[i][x]));
             }
         }
         try
         {
-            for (int i = 1; i < matriz.length; i++)
+            for (int i = 1; i < this.transitionTable.length; i++)
             {
-                newMatrix[i][0] = listStates.get(i-1).toString();            
+                this.transitionTable[i][0] = getListStates().get(i-1).toString();            
             }
-
-            for (int i = 1; i < matriz[0].length; i++)
+            for (int i = 1; i < this.transitionTable[0].length; i++)
             {
-                newMatrix[0][i] = diccionario.get(i-1).toString();            
+                this.transitionTable[0][i] = getDiccionario().get(i-1).toString();            
             }
         }
         catch(Exception e)
         {
             error = e.getMessage();
         }
-        
-        return newMatrix;
     }
     
     // agrega los saltos a la lista de estados nuevos
-    public static String[][] addNewStates(String[][] matriz)
+    public String[][] addNewStates(String[][] matriz)
     {
         String error = "";
-        for (int i = 0; i < listStates.size(); i++)
+        for (int i = 0; i < getListStates().size(); i++)
         {
             try 
             {
-                if(listStates.get(i).toString().contains(","))
+                if(getListStates().get(i).toString().contains(","))
                 {
-                    String [] estados = listStates.get(i).toString().split(",");
+                    String [] estados = getListStates().get(i).toString().split(",");
                     for (int x = 0; x < estados.length; x++)
                     {
                         for (int j = 1; j < matriz[0].length; j++)
@@ -238,12 +166,12 @@ public class AFND {
         {
             for (int i = 1; i < matriz.length; i++)
             {
-                matriz[i][0] = listStates.get(i-1).toString();            
+                matriz[i][0] = getListStates().get(i-1).toString();            
             }
 
-            for (int i = 1; i < listStates.size(); i++)
+            for (int i = 1; i < getListStates().size(); i++)
             {
-                matriz[0][i] = diccionario.get(i-1).toString();            
+                matriz[0][i] = getDiccionario().get(i-1).toString();            
             }
         }
         catch(Exception e)
@@ -317,7 +245,7 @@ public class AFND {
         return result;
     }
     
-    public static boolean isAFND(String[][] matriz)
+    public boolean isAFND(String[][] matriz)
     {
         boolean result = false;
         for (int i = 1; i < matriz.length; i++)
@@ -346,7 +274,7 @@ public class AFND {
         return matriz;
     }
     
-    public static String [][] getAFDphi(String [][] AFND)
+    public String [][] getAFDphi(String [][] AFND)
     {
         String [][] result = new String [AFND.length+1][AFND[0].length];
         
@@ -365,21 +293,63 @@ public class AFND {
         
         if(!listStates.contains("phi"))
         {
-            listStates.add("phi");
+            getListStates().add("phi");
         }
         
         return result;
     }
             
-    public static String[][] execMethod(String[][] x)
+    public String[][] execMethod(String[][] x)
     {
-        getNewStates(x);
-        String [][] result = addNewStates(reveleStates(x));
+        getNewStates();
+        String [][] result = addNewStates(reveleStates());
         result = setAFND(result);        
         if (isAFND(result))
         {
             result = execMethod(result);
         }
         return result;        
+    }
+
+    /**
+     * @return the listStates
+     */
+    public ArrayList getListStates() {
+        return listStates;
+    }
+
+    /**
+     * @param listStates the listStates to set
+     */
+    public void setListStates(ArrayList listStates) {
+        this.listStates = listStates;
+    }
+
+    /**
+     * @return the diccionario
+     */
+    public ArrayList getDiccionario() {
+        return diccionario;
+    }
+
+    /**
+     * @param diccionario the diccionario to set
+     */
+    public void setDiccionario(ArrayList diccionario) {
+        this.diccionario = diccionario;
+    }
+
+    /**
+     * @return the transitionTable
+     */
+    public String[][] getTransitionTable() {
+        return transitionTable;
+    }
+
+    /**
+     * @param transitionTable the transitionTable to set
+     */
+    public void setTransitionTable(String[][] transitionTable) {
+        this.transitionTable = transitionTable;
     }
 }
