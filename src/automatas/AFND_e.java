@@ -102,7 +102,8 @@ public class AFND_e {
         int in = 0;
         for(int j = 0 ; j < this.getLenghtTableTransition() ; j++)
         {
-            if(this.getTransitionTable()[j][0] == state)
+            String valor = this.getTransitionTable()[j][0].toString();
+            if(valor.equals(state))
             {
                 in = j;
                 continue;

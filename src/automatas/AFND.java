@@ -38,6 +38,22 @@ public class AFND {
         return estados;
     }
     
+    // Obtiene el indice del estado ingresado
+    public int getIndex(String state)
+    {
+        int in = 0;
+        for(int j = 1 ; j < this.getTransitionTable().length; j++)
+        {
+            String valor = this.getTransitionTable()[j][0].toString();
+            if(valor.equals(state))
+            {
+                in = j;
+                continue;
+            }
+        }
+        return in;
+    }
+    
     // obtiene la lista de estados del automata
     public ArrayList getDictionary()
     {
@@ -57,7 +73,7 @@ public class AFND {
         {
             for (int x = 1; x < this.transitionTable[i].length; x++)
             {
-                if(isValidString(this.transitionTable[i][x],this.transitionTable))
+                if(isValidString(this.transitionTable[i][x]))
                 {
                     getListStates().add(this.transitionTable[i][x]);
                 }
@@ -66,7 +82,7 @@ public class AFND {
     }
     
     // Se considera un string valido aquel que no esta en la lista y no es estado "phi"
-    public boolean isValidString(Object x,String[][] matriz)
+    public boolean isValidString(Object x)
     {
         boolean result = false;
         String error = "";
@@ -84,7 +100,7 @@ public class AFND {
     }
     
     // revela la nueva matriz con los estados descubiertos nuevos
-    public String[][] reveleStates()
+    public void reveleStates()
     {
         String [][] newMatrix = new String [getListStates().size()+1][this.transitionTable[0].length];
         for (int i = 1; i < this.transitionTable.length; i++)
@@ -104,7 +120,7 @@ public class AFND {
                 }
             }
         }
-        return newMatrix;
+        setTransitionTable(newMatrix);
     }
     
     public void finishStates()
@@ -114,9 +130,7 @@ public class AFND {
         {
             for (int x = 1; x < this.transitionTable[i].length; x++)
             {
-                int a = getListStates().indexOf(this.transitionTable[i][x])+1;
-                
-                this.transitionTable[i][x] = String.valueOf(getListStates().indexOf(this.transitionTable[i][x]));
+                this.transitionTable[i][x] = String.valueOf(getIndex(this.transitionTable[i][x]));
             }
         }
         try
@@ -182,7 +196,7 @@ public class AFND {
         return matriz;
     }
     
-    
+    // Retorna el nuevo string del estado conjugado completo 
     public static String unionConjuntos(String q, String q1)
     {
         if(q != null)
@@ -203,17 +217,12 @@ public class AFND {
         return q;
     }
     
-    public static String cleanState(String q,String[][] a)
+    
+    public static String cleanState(String q)
     {
         String result = "";
         int j = 0;
         ArrayList lista = new ArrayList();
-        
-        // probando matriz
-        if(q == null)
-        {
-            int prueba = 1;
-        }
         
         if(q != null && q.contains(","))
         {
@@ -268,13 +277,13 @@ public class AFND {
         {
             for (int x = 1; x < matriz[i].length; x++)
             {
-                matriz[i][x] =  cleanState(matriz[i][x],matriz);
+                matriz[i][x] =  cleanState(matriz[i][x]);
             }
         }
         return matriz;
     }
     
-    public String [][] getAFDphi(String [][] AFND)
+    public void getAFDphi(String [][] AFND)
     {
         String [][] result = new String [AFND.length+1][AFND[0].length];
         
@@ -286,6 +295,7 @@ public class AFND {
             }
         }        
         
+        // add estado phi o transiciones vacias
         for (int i = 0; i < result[0].length; i++)
         {
             result[AFND.length][i] = "phi";
@@ -296,13 +306,18 @@ public class AFND {
             getListStates().add("phi");
         }
         
-        return result;
+        setTransitionTable(result);
     }
             
     public String[][] execMethod(String[][] x)
     {
+        // Obtiene los nuevos estados
         getNewStates();
-        String [][] result = addNewStates(reveleStates());
+        
+        // crea la nueva tabla de transiciones
+        reveleStates();
+                
+        String [][] result = addNewStates(getTransitionTable());
         result = setAFND(result);        
         if (isAFND(result))
         {

@@ -17,7 +17,7 @@ public class Test {
     public static void main(String[] args) {
         
         //Thompson th = new Thompson("A*");
-        String [][] a = {{"","a","b"},{"1","1,2","phi"},{"2","1","phi"}};
+        String [][] a = {{"","a","b"},{"1","1,2","1"},{"2","1","phi"}};
         String [][] b = {{"","a","b"},{"2","1","phi"}};
         
         //String [][] result = th.union(a, b);
@@ -28,7 +28,7 @@ public class Test {
         af.setListStates(af.getStates());
         af.setDiccionario(af.getDictionary());
         String [][] result = af.execMethod(af.getTransitionTable());
-        result = af.getAFDphi(result);
+        af.getAFDphi(result);
         af.finishStates();
         result = af.getTransitionTable();
         
